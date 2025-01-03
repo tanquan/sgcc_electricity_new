@@ -10,7 +10,7 @@ host_network: true
 startup: application
 boot: auto
 init: false
-#image: "{arch}-sgcc_electricity_new"
+image: "registry.cn-hangzhou.aliyuncs.com/arcw/sgcc_electricity-{arch}"
 map:
   - config:rw
 options:

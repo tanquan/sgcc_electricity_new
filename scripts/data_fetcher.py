@@ -399,8 +399,14 @@ class DataFetcher:
             logging.info(
                 f"Get year power charge for {user_id} successfully, yealrly charge is {yearly_charge} CNY")
 
+        # 按月获取数据
+        month, month_usage, month_charge = self._get_month_usage(driver)
+
         # get yesterday usage
         last_daily_date, last_daily_usage = self._get_yesterday_usage(driver)
+
+        if month is None:
+            logging.error(f"Get month power usage for {user_id} failed, pass")
 
         # 新增储存用电量
         if self.enable_database_storage:
@@ -408,10 +414,7 @@ class DataFetcher:
             logging.info("enable_database_storage is true, we will store the data to the database.")
             # 按天获取数据 7天/30天
             date, usages = self._get_daily_usage_data(driver)
-            # 按月获取数据
-            month, month_usage, month_charge = self._get_month_usage(driver)
-            if month is None:
-                logging.error(f"Get month power usage for {user_id} failed, pass")
+            self._save_user_data(user_id, balance, last_daily_date, last_daily_usage, date, usages, month, month_usage, month_charge, yearly_charge, yearly_usage)
         else:
             logging.info("enable_database_storage is false, we will not store the data to the database.")
 
@@ -420,8 +423,6 @@ class DataFetcher:
         else:
             logging.info(
                 f"Get daily power consumption for {user_id} successfully, , {last_daily_date} usage is {last_daily_usage} kwh.")
-                
-        self._save_user_data(user_id, balance, last_daily_date, last_daily_usage, date, usages, month, month_usage, month_charge, yearly_charge, yearly_usage)
         
         if month_charge:
             month_charge = month_charge[-1]
